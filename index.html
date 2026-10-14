@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>중2 수학 퀴즈 - 경우의 수와 확률</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-light: #eff6ff;
+      --success: #16a34a;
+      --success-bg: #f0fdf4;
+      --success-border: #86efac;
+      --danger: #dc2626;
+      --danger-bg: #fef2f2;
+      --danger-border: #fca5a5;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --border: #e2e8f0;
+      --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+      --font-scale: 1;
+    }
+
+    /* TV 모드 (글자 크기 확대) */
+    body.tv-mode {
+      --font-scale: 1.25;
+    }
+
+    body.tv-large-mode {
+      --font-scale: 1.45;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
+      background: var(--bg);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: clamp(12px, 3vw, 28px);
+      line-height: 1.5;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 860px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* 상단 헤더 & 컨트롤 바 */
+    .top-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      background: var(--card-bg);
+      padding: 14px 20px;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      border: 1px solid var(--border);
+    }
+
+    .title-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      background: #dbeafe;
+      color: #1e40af;
+      font-weight: 700;
+      border-radius: 8px;
+      font-size: calc(0.85rem * var(--font-scale));
+      letter-spacing: -0.02em;
+    }
+
+    .app-title {
+      font-size: calc(1.15rem * var(--font-scale));
+      font-weight: 800;
+      color: #1e293b;
+      letter-spacing: -0.03em;
+    }
+
+    .controls-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-toggle {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      color: #334155;
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: calc(0.85rem * var(--font-scale));
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-toggle:hover {
+      background: #e2e8f0;
+    }
+
+    .btn-toggle.active {
+      background: #2563eb;
+      color: #ffffff;
+      border-color: #2563eb;
+    }
+
+    /* 진행도 바 */
+    .progress-section {
+      background: var(--card-bg);
+      padding: 16px 20px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 800;
+      font-size: calc(0.95rem * var(--font-scale));
+      color: var(--text-muted);
+    }
+
+    .question-counter {
+      color: var(--primary);
+      font-size: calc(1.15rem * var(--font-scale));
+    }
+
+    .current-score {
+      background: #f8fafc;
+      padding: 4px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 12px;
+      background: #e2e8f0;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6, #2563eb);
+      width: 5%;
+      border-radius: 999px;
+      transition: width 0.35s ease;
+    }
+
+    /* 메인 퀴즈 카드 */
+    .quiz-card {
+      background: var(--card-bg);
+      border-radius: 24px;
+      padding: clamp(20px, 4vw, 36px);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: clamp(18px, 3vw, 28px);
+    }
+
+    /* 문제 영역 */
+    .question-header {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .q-number-tag {
+      align-self: flex-start;
+      background: #eff6ff;
+      color: var(--primary);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 800;
+      font-size: calc(0.9rem * var(--font-scale));
+      border: 1px solid #bfdbfe;
+    }
+
+    .question-text {
+      font-size: calc(1.35rem * var(--font-scale));
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.5;
+      letter-spacing: -0.02em;
+      word-break: keep-all;
+    }
+
+    /* 보기 목록 */
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .option-btn {
+      position: relative;
+      background: #ffffff;
+      border: 2px solid #cbd5e1;
+      border-radius: 16px;
+      padding: clamp(14px, 2.5vw, 20px) clamp(16px, 3vw, 24px);
+      text-align: left;
+      font-size: calc(1.12rem * var(--font-scale));
+      font-weight: 700;
+      color: #1e293b;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+      line-height: 1.4;
+      word-break: keep-all;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: #3b82f6;
+      background: #f8fafc;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.12);
+    }
+
+    .option-btn:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .option-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: clamp(34px, 4vw, 42px);
+      height: clamp(34px, 4vw, 42px);
+      min-width: clamp(34px, 4vw, 42px);
+      border-radius: 50%;
+      background: #f1f5f9;
+      color: #475569;
+      font-weight: 800;
+      font-size: calc(1rem * var(--font-scale));
+      transition: all 0.15s ease;
+    }
+
+    /* 선택 및 정답/오답 상태 스타일 */
+    .option-btn.correct {
+      background: var(--success-bg) !important;
+      border-color: var(--success) !important;
+      color: #14532d !important;
+    }
+
+    .option-btn.correct .option-num {
+      background: var(--success);
+      color: #ffffff;
+    }
+
+    .option-btn.wrong {
+      background: var(--danger-bg) !important;
+      border-color: var(--danger) !important;
+      color: #7f1d1d !important;
+    }
+
+    .option-btn.wrong .option-num {
+      background: var(--danger);
+      color: #ffffff;
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-feedback-icon {
+      margin-left: auto;
+      font-size: calc(1.3rem * var(--font-scale));
+      font-weight: 900;
+    }
+
+    /* 피드백 및 해설 박스 */
+    .explanation-card {
+      display: none;
+      background: #f8fafc;
+      border-radius: 18px;
+      padding: clamp(16px, 3vw, 24px);
+      border: 2px solid #e2e8f0;
+      animation: fadeIn 0.25s ease-out;
+    }
+
+    .explanation-card.show {
+      display: block;
+    }
+
+    .explanation-card.correct-style {
+      background: #f0fdf4;
+      border-color: var(--success-border);
+    }
+
+    .explanation-card.wrong-style {
+      background: #fef2f2;
+      border-color: var(--danger-border);
+    }
+
+    .feedback-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+      font-size: calc(1.2rem * var(--font-scale));
+      font-weight: 800;
+    }
+
+    .feedback-header.correct-text {
+      color: var(--success);
+    }
+
+    .feedback-header.wrong-text {
+      color: var(--danger);
+    }
+
+    .explanation-body {
+      font-size: calc(1.08rem * var(--font-scale));
+      color: #334155;
+      font-weight: 600;
+      line-height: 1.6;
+      word-break: keep-all;
+    }
+
+    /* 네비게이션 버튼 (다음 문제) */
+    .card-footer {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    .btn-next {
+      background: var(--primary);
+      color: #ffffff;
+      border: none;
+      border-radius: 14px;
+      padding: clamp(14px, 2.5vw, 18px) clamp(24px, 4vw, 36px);
+      font-size: calc(1.15rem * var(--font-scale));
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+      transition: all 0.15s ease;
+    }
+
+    .btn-next:hover {
+      background: var(--primary-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(37, 99, 235, 0.4);
+    }
+
+    .btn-next:active {
+      transform: translateY(0);
+    }
+
+    /* 결과 화면 */
+    .result-container {
+      display: none;
+      background: var(--card-bg);
+      border-radius: 24px;
+      padding: clamp(24px, 5vw, 44px);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      text-align: center;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .result-container.show {
+      display: flex;
+    }
+
+    .result-badge {
+      background: #e0f2fe;
+      color: #0369a1;
+      font-weight: 800;
+      font-size: calc(1rem * var(--font-scale));
+      padding: 6px 18px;
+      border-radius: 24px;
+    }
+
+    .score-circle {
+      position: relative;
+      width: clamp(150px, 24vw, 210px);
+      height: clamp(150px, 24vw, 210px);
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 25px rgba(37, 99, 235, 0.35);
+      margin: 10px 0;
+    }
+
+    .score-points {
+      font-size: calc(3rem * var(--font-scale));
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .score-total {
+      font-size: calc(1rem * var(--font-scale));
+      opacity: 0.85;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+
+    .result-title {
+      font-size: calc(1.7rem * var(--font-scale));
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .result-desc {
+      font-size: calc(1.15rem * var(--font-scale));
+      color: var(--text-muted);
+      max-width: 540px;
+      line-height: 1.6;
+      word-break: keep-all;
+    }
+
+    .result-stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      width: 100%;
+      max-width: 480px;
+      margin: 6px 0;
+    }
+
+    .stat-box {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      padding: 16px;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .stat-label {
+      font-size: calc(0.9rem * var(--font-scale));
+      font-weight: 700;
+      color: #64748b;
+    }
+
+    .stat-val {
+      font-size: calc(1.5rem * var(--font-scale));
+      font-weight: 900;
+      color: #0f172a;
+    }
+
+    .btn-restart {
+      background: #16a34a;
+      color: #ffffff;
+      border: none;
+      border-radius: 16px;
+      padding: clamp(14px, 2.8vw, 20px) clamp(32px, 5vw, 48px);
+      font-size: calc(1.25rem * var(--font-scale));
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 6px 18px rgba(22, 163, 74, 0.35);
+      transition: all 0.15s ease;
+    }
+
+    .btn-restart:hover {
+      background: #15803d;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 22px rgba(22, 163, 74, 0.45);
+    }
+
+    /* 틀린 문제 다시보기 아코디언 */
+    .review-section {
+      width: 100%;
+      text-align: left;
+      margin-top: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .review-header {
+      font-size: calc(1.15rem * var(--font-scale));
+      font-weight: 800;
+      color: #334155;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      padding: 12px 16px;
+      background: #f1f5f9;
+      border-radius: 12px;
+    }
+
+    .review-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .review-item {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-size: calc(0.95rem * var(--font-scale));
+    }
+
+    .review-item .q-title {
+      font-weight: 800;
+      color: #991b1b;
+      margin-bottom: 6px;
+    }
+
+    .review-item .q-ans {
+      font-weight: 700;
+      color: #166534;
+      margin-bottom: 4px;
+    }
+
+    .review-item .q-exp {
+      color: #475569;
+    }
+
+    /* 캔버스 축하 효과 */
+    #confetti-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 모바일 최적화 */
+    @media (max-width: 640px) {
+      .top-bar {
+        padding: 12px 16px;
+      }
+      .controls-group {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .option-btn {
+        padding: 14px 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="confetti-canvas"></canvas>
+
+  <div class="app-container">
+    <!-- 헤더 & 화면 모드 설정 -->
+    <header class="top-bar">
+      <div class="title-group">
+        <span class="badge">중학교 2학년 수학</span>
+        <h1 class="app-title">경우의 수와 확률 마스터 퀴즈</h1>
+      </div>
+      <div class="controls-group">
+        <button id="btn-sound" class="btn-toggle active" title="효과음 켜기/끄기">
+          <span>🔊</span> 소리 켬
+        </button>
+        <button id="btn-tv" class="btn-toggle" title="교실 TV/전자칠판용 대형 화면 모드">
+          <span>📺</span> 교실 TV 모드
+        </button>
+      </div>
+    </header>
+
+    <!-- 진행 상황 표시줄 -->
+    <section class="progress-section" id="progress-bar-section">
+      <div class="progress-meta">
+        <div>
+          <span>문제 </span>
+          <strong class="question-counter" id="current-q-num">1</strong>
+          <span> / 20</span>
+        </div>
+        <div class="current-score">
+          <span>현재 점수: </span>
+          <strong id="live-score">0</strong><span>점</span>
+        </div>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+    </section>
+
+    <!-- 문제 카드 -->
+    <main class="quiz-card" id="quiz-card">
+      <div class="question-header">
+        <span class="q-number-tag" id="q-category">경우의 수</span>
+        <h2 class="question-text" id="question-text">문제를 불러오는 중입니다...</h2>
+      </div>
+
+      <!-- 4지선다 보기 -->
+      <div class="options-grid" id="options-container" role="radiogroup">
+        <!-- JS로 동적 생성 -->
+      </div>
+
+      <!-- 즉시 피드백 및 한두 문장 쉬운 해설 -->
+      <div class="explanation-card" id="explanation-card">
+        <div class="feedback-header" id="feedback-header">
+          <span id="feedback-icon"></span>
+          <span id="feedback-msg"></span>
+        </div>
+        <div class="explanation-body" id="explanation-text"></div>
+      </div>
+
+      <!-- 하단 다음 버튼 -->
+      <div class="card-footer" id="card-footer" style="display: none;">
+        <button class="btn-next" id="btn-next">
+          <span id="btn-next-text">다음 문제</span> ➔
+        </button>
+      </div>
+    </main>
+
+    <!-- 최종 결과 화면 -->
+    <section class="result-container" id="result-container">
+      <span class="result-badge">퀴즈 완료! 🎉</span>
+      <h2 class="result-title" id="result-greeting">수고하셨습니다!</h2>
+
+      <div class="score-circle">
+        <div class="score-points" id="final-score">100</div>
+        <div class="score-total">100점 만점</div>
+      </div>
+
+      <p class="result-desc" id="result-desc">
+        경우의 수와 확률 개념을 아주 훌륭하게 이해하고 있습니다!
+      </p>
+
+      <div class="result-stats">
+        <div class="stat-box">
+          <span class="stat-label">맞힌 문제</span>
+          <span class="stat-val" style="color: var(--success);"><span id="stat-correct">20</span> / 20</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-label">틀린 문제</span>
+          <span class="stat-val" style="color: var(--danger);"><span id="stat-wrong">0</span> / 20</span>
+        </div>
+      </div>
+
+      <!-- 오답 다시보기 -->
+      <div class="review-section" id="review-section" style="display: none;">
+        <div class="review-header" id="review-toggle-btn">
+          <span>📝 오답 노트 확인하기 (<span id="wrong-count-badge">0</span>개)</span>
+          <span id="review-arrow">▼</span>
+        </div>
+        <div class="review-list" id="review-list"></div>
+      </div>
+
+      <button class="btn-restart" id="btn-restart">
+        <span>🔄 다시 풀기</span>
+      </button>
+    </section>
+  </div>
+
+  <script>
+    /* ============================================================
+       중학교 2학년 수학 (경우의 수와 확률) 20문제 데이터셋
+       ============================================================ */
+    const quizData = [
+      {
+        id: 1,
+        category: "경우의 수",
+        question: "주사위 1개를 던질 때, 4 이상의 눈이 나오는 경우의 수는?",
+        options: ["1가지", "2가지", "3가지", "4가지"],
+        answer: 2, // 3가지 (4, 5, 6)
+        explanation: "4 이상의 눈은 4, 5, 6으로 모두 3가지입니다."
+      },
+      {
+        id: 2,
+        category: "경우의 수 (합의 법칙)",
+        question: "1부터 10까지의 숫자가 적힌 카드 10장 중 1장을 뽑을 때, 3의 배수 또는 5의 배수가 나오는 경우의 수는?",
+        options: ["3가지", "4가지", "5가지", "6가지"],
+        answer: 2, // 5가지 (3, 6, 9, 5, 10)
+        explanation: "3의 배수는 3, 6, 9 (3가지), 5의 배수는 5, 10 (2가지)이므로 더하면 3 + 2 = 5가지입니다."
+      },
+      {
+        id: 3,
+        category: "경우의 수 (곱의 법칙)",
+        question: "분식집에서 김밥 3종류와 라면 4종류 중 각각 하나씩 골라 세트로 주문하는 경우의 수는?",
+        options: ["7가지", "10가지", "12가지", "15가지"],
+        answer: 2, // 12가지 (3 * 4)
+        explanation: "김밥을 고르는 3가지와 라면을 고르는 4가지를 잇달아 고르므로 3 × 4 = 12가지입니다."
+      },
+      {
+        id: 4,
+        category: "경우의 수",
+        question: "동전 1개와 주사위 1개를 동시에 던질 때 일어나는 모든 경우의 수는?",
+        options: ["8가지", "12가지", "16가지", "24가지"],
+        answer: 1, // 12가지 (2 * 6)
+        explanation: "동전의 앞·뒤 2가지와 주사위 눈 6가지가 동시에 일어나므로 2 × 6 = 12가지입니다."
+      },
+      {
+        id: 5,
+        category: "줄 세우기 경우의 수",
+        question: "서로 다른 4명의 학생을 한 줄로 나란히 세우는 경우의 수는?",
+        options: ["16가지", "20가지", "24가지", "28가지"],
+        answer: 2, // 24가지 (4 * 3 * 2 * 1)
+        explanation: "첫째부터 넷째 자리까지 차례대로 세우므로 4 × 3 × 2 × 1 = 24가지입니다."
+      },
+      {
+        id: 6,
+        category: "대표 뽑기 (자격 다름)",
+        question: "민호네 반 후보 5명 중에서 반장 1명과 부반장 1명을 뽑는 경우의 수는?",
+        options: ["10가지", "15가지", "20가지", "25가지"],
+        answer: 2, // 20가지 (5 * 4)
+        explanation: "반장으로 뽑힐 수 있는 5명, 그 다음 부반장 4명이므로 5 × 4 = 20가지입니다."
+      },
+      {
+        id: 7,
+        category: "대표 뽑기 (자격 같음)",
+        question: "학생 4명 중에서 동아리 대표 2명을 뽑는 경우의 수는?",
+        options: ["4가지", "6가지", "8가지", "12가지"],
+        answer: 1, // 6가지 ( (4*3)/2 )
+        explanation: "자격이 같으므로 순서에 상관이 없어 (4 × 3) ÷ 2 = 6가지입니다."
+      },
+      {
+        id: 8,
+        category: "자연수 만들기",
+        question: "0, 1, 2, 3의 숫자가 적힌 4장의 카드 중 2장을 뽑아 만들 수 있는 두 자리 자연수의 개수는?",
+        options: ["6개", "9개", "12개", "16개"],
+        answer: 1, // 9개 (3 * 3)
+        explanation: "십의 자리에는 0이 올 수 없어 3가지(1, 2, 3), 일의 자리는 0을 포함한 남은 3가지이므로 3 × 3 = 9개입니다."
+      },
+      {
+        id: 9,
+        category: "확률의 뜻",
+        question: "주사위 1개를 던질 때, 짝수의 눈이 나올 확률은?",
+        options: ["1/6", "1/3", "1/2", "2/3"],
+        answer: 2, // 1/2 (3/6)
+        explanation: "모든 눈의 수 6가지 중 짝수(2, 4, 6)는 3가지이므로 확률은 3/6 = 1/2입니다."
+      },
+      {
+        id: 10,
+        category: "확률의 기본 성질",
+        question: "주사위 1개를 던질 때, 7 이상의 눈이 나올 확률은?",
+        options: ["0", "1/6", "1/2", "1"],
+        answer: 0, // 0
+        explanation: "주사위의 눈은 1부터 6까지이므로 7 이상의 눈은 절대로 일어날 수 없어 확률은 0입니다."
+      },
+      {
+        id: 11,
+        category: "확률의 기본 성질",
+        question: "어떤 사건이 일어날 확률을 p라고 할 때, p의 값의 범위로 항상 옳은 것은?",
+        options: ["0 < p < 1", "0 ≤ p ≤ 1", "0 ≤ p < 1", "1 ≤ p ≤ 100"],
+        answer: 1, // 0 <= p <= 1
+        explanation: "확률은 절대로 일어나지 않는 0부터 반드시 일어나는 1 사이의 값(0 ≤ p ≤ 1)을 갖습니다."
+      },
+      {
+        id: 12,
+        category: "확률의 계산",
+        question: "빨간 공 3개와 파란 공 5개가 들어있는 상자에서 공 1개를 꺼낼 때, 빨간 공이 나올 확률은?",
+        options: ["1/8", "3/8", "5/8", "3/5"],
+        answer: 1, // 3/8
+        explanation: "전체 공의 개수는 3 + 5 = 8개이고, 빨간 공은 3개이므로 확률은 3/8입니다."
+      },
+      {
+        id: 13,
+        category: "확률의 계산",
+        question: "1부터 20까지 번호가 적힌 구슬 20개 중 1개를 뽑을 때, 4의 배수가 나올 확률은?",
+        options: ["1/5", "1/4", "3/10", "2/5"],
+        answer: 1, // 1/4 (5/20)
+        explanation: "4의 배수는 4, 8, 12, 16, 20의 5가지이므로 확률은 5/20 = 1/4입니다."
+      },
+      {
+        id: 14,
+        category: "여사건의 확률",
+        question: "내일 비가 올 확률이 35%일 때, 내일 비가 오지 않을 확률은?",
+        options: ["35%", "50%", "65%", "75%"],
+        answer: 2, // 65% (100% - 35%)
+        explanation: "어떤 사건이 일어나지 않을 확률은 100%에서 일어날 확률을 뺀 100% - 35% = 65%입니다."
+      },
+      {
+        id: 15,
+        category: "여사건의 확률 (적어도)",
+        question: "동전 2개를 동시에 던질 때, 적어도 한 개는 앞면이 나올 확률은?",
+        options: ["1/4", "1/2", "3/4", "1"],
+        answer: 2, // 3/4 (1 - 1/4)
+        explanation: "'모두 뒷면'이 나올 확률 1/4을 전체 1에서 빼면 1 - 1/4 = 3/4입니다."
+      },
+      {
+        id: 16,
+        category: "확률의 덧셈",
+        question: "주사위 1개를 던질 때, 2 이하 또는 5 이상의 눈이 나올 확률은?",
+        options: ["1/3", "1/2", "2/3", "5/6"],
+        answer: 2, // 2/3 (2/6 + 2/6 = 4/6)
+        explanation: "2 이하는 2가지(1, 2), 5 이상은 2가지(5, 6)이므로 (2/6) + (2/6) = 4/6 = 2/3입니다."
+      },
+      {
+        id: 17,
+        category: "확률의 계산",
+        question: "서로 다른 주사위 2개를 동시에 던질 때, 나온 눈의 수의 합이 4가 될 확률은?",
+        options: ["1/18", "1/12", "1/9", "1/6"],
+        answer: 1, // 1/12 (3/36)
+        explanation: "눈의 합이 4인 경우는 (1,3), (2,2), (3,1)의 3가지이므로 3/36 = 1/12입니다."
+      },
+      {
+        id: 18,
+        category: "확률의 곱셈",
+        question: "동전 1개와 주사위 1개를 던질 때, 동전은 앞면이 나오고 주사위는 3의 배수가 나올 확률은?",
+        options: ["1/12", "1/6", "1/4", "1/3"],
+        answer: 1, // 1/6 ( (1/2) * (2/6) )
+        explanation: "동전 앞면 확률 1/2과 주사위 3의 배수(3, 6) 확률 2/6(=1/3)을 곱하면 (1/2) × (1/3) = 1/6입니다."
+      },
+      {
+        id: 19,
+        category: "확률 (가위바위보)",
+        question: "지수와 유진이가 가위바위보를 한 번 할 때, 비길 확률은?",
+        options: ["1/9", "1/6", "1/3", "1/2"],
+        answer: 2, // 1/3 (3/9)
+        explanation: "전체 9가지 경우 중 서로 같은 손을 내어 비기는 경우는 3가지이므로 3/9 = 1/3입니다."
+      },
+      {
+        id: 20,
+        category: "연속하여 뽑는 확률 (복원 안 됨)",
+        question: "당첨 제비 2개를 포함한 5개의 제비 중, 한 개를 뽑아 확인하고 '다시 넣지 않고' 하나를 더 뽑을 때 둘 다 당첨될 확률은?",
+        options: ["1/10", "1/5", "2/25", "4/25"],
+        answer: 0, // 1/10 ( (2/5) * (1/4) )
+        explanation: "첫 번째 당첨 확률은 2/5이고, 남은 4개 중 당첨 1개이므로 (2/5) × (1/4) = 2/20 = 1/10입니다."
+      }
+    ];
+
+    /* ============================================================
+       앱 상태 관리
+       ============================================================ */
+    let currentIndex = 0;
+    let score = 0;
+    let answered = false;
+    let wrongQuestions = [];
+    let soundEnabled = true;
+
+    /* DOM 요소 참조 */
+    const currentQNumEl = document.getElementById("current-q-num");
+    const liveScoreEl = document.getElementById("live-score");
+    const progressFillEl = document.getElementById("progress-fill");
+    const qCategoryEl = document.getElementById("q-category");
+    const questionTextEl = document.getElementById("question-text");
+    const optionsContainer = document.getElementById("options-container");
+    const explanationCard = document.getElementById("explanation-card");
+    const feedbackHeader = document.getElementById("feedback-header");
+    const feedbackIcon = document.getElementById("feedback-icon");
+    const feedbackMsg = document.getElementById("feedback-msg");
+    const explanationText = document.getElementById("explanation-text");
+    const cardFooter = document.getElementById("card-footer");
+    const btnNext = document.getElementById("btn-next");
+    const btnNextText = document.getElementById("btn-next-text");
+
+    const quizCard = document.getElementById("quiz-card");
+    const progressBarSection = document.getElementById("progress-bar-section");
+    const resultContainer = document.getElementById("result-container");
+    const finalScoreEl = document.getElementById("final-score");
+    const resultGreeting = document.getElementById("result-greeting");
+    const resultDesc = document.getElementById("result-desc");
+    const statCorrect = document.getElementById("stat-correct");
+    const statWrong = document.getElementById("stat-wrong");
+    const btnRestart = document.getElementById("btn-restart");
+    const reviewSection = document.getElementById("review-section");
+    const reviewToggleBtn = document.getElementById("review-toggle-btn");
+    const reviewList = document.getElementById("review-list");
+    const wrongCountBadge = document.getElementById("wrong-count-badge");
+    const reviewArrow = document.getElementById("review-arrow");
+
+    const btnSound = document.getElementById("btn-sound");
+    const btnTv = document.getElementById("btn-tv");
+
+    /* ============================================================
+       Web Audio API - 무설치 내장 신디사이저 효과음
+       ============================================================ */
+    const audioCtx = (window.AudioContext || window.webkitAudioContext) ? new (window.AudioContext || window.webkitAudioContext)() : null;
+
+    function playTone(freq, type, duration, delay = 0) {
+      if (!soundEnabled || !audioCtx) return;
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      setTimeout(() => {
+        try {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+          gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + duration);
+        } catch (e) {
+          console.error(e);
+        }
+      }, delay * 1000);
+    }
+
+    function playSuccessSound() {
+      playTone(523.25, "sine", 0.12, 0);      // C5
+      playTone(659.25, "sine", 0.14, 0.1);    // E5
+      playTone(783.99, "triangle", 0.25, 0.2); // G5
+    }
+
+    function playWrongSound() {
+      playTone(311.13, "sawtooth", 0.18, 0);   // D#4
+      playTone(261.63, "sawtooth", 0.28, 0.15); // C4
+    }
+
+    function playCompleteSound() {
+      playTone(523.25, "triangle", 0.12, 0);
+      playTone(659.25, "triangle", 0.12, 0.12);
+      playTone(783.99, "triangle", 0.12, 0.24);
+      playTone(1046.50, "triangle", 0.4, 0.36);
+    }
+
+    /* ============================================================
+       문제 렌더링
+       ============================================================ */
+    function loadQuestion(index) {
+      answered = false;
+      const data = quizData[index];
+
+      // 진행도 갱신
+      currentQNumEl.textContent = index + 1;
+      progressFillEl.style.width = `${((index) / quizData.length) * 100}%`;
+      qCategoryEl.textContent = data.category;
+      questionTextEl.textContent = `${index + 1}. ${data.question}`;
+
+      // 이전 피드백 및 다음 버튼 숨김
+      explanationCard.classList.remove("show", "correct-style", "wrong-style");
+      cardFooter.style.display = "none";
+      btnNextText.textContent = (index === quizData.length - 1) ? "결과 보기" : "다음 문제";
+
+      // 4지선다 보기 생성
+      optionsContainer.innerHTML = "";
+      const numLabels = ["①", "②", "③", "④"];
+
+      data.options.forEach((optText, i) => {
+        const button = document.createElement("button");
+        button.className = "option-btn";
+        button.setAttribute("role", "radio");
+        button.setAttribute("aria-checked", "false");
+        button.innerHTML = `
+          <span class="option-num">${numLabels[i]}</span>
+          <span class="option-text">${optText}</span>
+          <span class="option-feedback-icon"></span>
+        `;
+        button.addEventListener("click", () => handleSelectOption(i));
+        optionsContainer.appendChild(button);
+      });
+    }
+
+    /* ============================================================
+       보기 선택 시 채점 & 해설 표시
+       ============================================================ */
+    function handleSelectOption(selectedIndex) {
+      if (answered) return;
+      answered = true;
+
+      const currentQ = quizData[currentIndex];
+      const isCorrect = (selectedIndex === currentQ.answer);
+      const buttons = optionsContainer.querySelectorAll(".option-btn");
+
+      // 모든 보기 비활성화
+      buttons.forEach(btn => btn.disabled = true);
+
+      // 선택한 버튼 및 정답 표시
+      const chosenBtn = buttons[selectedIndex];
+      const correctBtn = buttons[currentQ.answer];
+
+      if (isCorrect) {
+        score += 5; // 20문제 * 5점 = 100점
+        liveScoreEl.textContent = score;
+        chosenBtn.classList.add("correct");
+        chosenBtn.querySelector(".option-feedback-icon").textContent = "✓";
+        chosenBtn.setAttribute("aria-checked", "true");
+
+        feedbackHeader.className = "feedback-header correct-text";
+        feedbackIcon.textContent = "🎉";
+        feedbackMsg.textContent = "정답입니다! 훌륭해요!";
+        explanationCard.className = "explanation-card show correct-style";
+        playSuccessSound();
+      } else {
+        chosenBtn.classList.add("wrong");
+        chosenBtn.querySelector(".option-feedback-icon").textContent = "✕";
+        correctBtn.classList.add("correct");
+        correctBtn.querySelector(".option-feedback-icon").textContent = "✓";
+
+        feedbackHeader.className = "feedback-header wrong-text";
+        feedbackIcon.textContent = "💡";
+        feedbackMsg.textContent = `아쉬워요! 정답은 ${['①', '②', '③', '④'][currentQ.answer]}번입니다.`;
+        explanationCard.className = "explanation-card show wrong-style";
+        playWrongSound();
+
+        // 오답 목록에 기록
+        wrongQuestions.push({
+          question: currentQ.question,
+          category: currentQ.category,
+          correctAnswer: currentQ.options[currentQ.answer],
+          explanation: currentQ.explanation
+        });
+      }
+
+      // 해설 텍스트 주입
+      explanationText.textContent = currentQ.explanation;
+
+      // 다음 문제 버튼 노출
+      cardFooter.style.display = "flex";
+      btnNext.focus();
+    }
+
+    /* ============================================================
+       다음 문제 / 결과 화면 전환
+       ============================================================ */
+    function handleNext() {
+      if (currentIndex < quizData.length - 1) {
+        currentIndex++;
+        loadQuestion(currentIndex);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } else {
+        showResults();
+      }
+    }
+
+    function showResults() {
+      quizCard.style.display = "none";
+      progressBarSection.style.display = "none";
+      resultContainer.classList.add("show");
+
+      finalScoreEl.textContent = score;
+      statCorrect.textContent = (score / 5);
+      statWrong.textContent = (quizData.length - (score / 5));
+
+      // 맞힌 개수에 따른 격려 메시지
+      if (score === 100) {
+        resultGreeting.textContent = "완벽한 만점입니다! 🏆";
+        resultDesc.textContent = "경우의 수와 확률의 모든 개념을 완벽하게 마스터했습니다! 수학 천재!";
+        triggerConfetti();
+        playCompleteSound();
+      } else if (score >= 80) {
+        resultGreeting.textContent = "대단해요! 고득점 달성! 🌟";
+        resultDesc.textContent = "경우의 수와 확률의 핵심 성질을 아주 잘 이해하고 있습니다. 조금만 더 연습하면 100점!";
+        triggerConfetti();
+        playCompleteSound();
+      } else if (score >= 60) {
+        resultGreeting.textContent = "좋은 시도예요! 힘내세요! 👍";
+        resultDesc.textContent = "기본 개념이 잘 잡혀있습니다. 헷갈렸던 문제들의 해설을 한 번 더 복습해 보세요!";
+      } else {
+        resultGreeting.textContent = "다시 도전해 볼까요? 📖";
+        resultDesc.textContent = "합의 법칙과 곱의 법칙, 그리고 확률의 기본 공식들을 천천히 다시 익혀보세요!";
+      }
+
+      // 오답 목록 생성
+      if (wrongQuestions.length > 0) {
+        reviewSection.style.display = "flex";
+        wrongCountBadge.textContent = wrongQuestions.length;
+        reviewList.innerHTML = "";
+        wrongQuestions.forEach((item, idx) => {
+          const div = document.createElement("div");
+          div.className = "review-item";
+          div.innerHTML = `
+            <div class="q-title">[${item.category}] ${item.question}</div>
+            <div class="q-ans">✔ 바른 정답: ${item.correctAnswer}</div>
+            <div class="q-exp">💡 해설: ${item.explanation}</div>
+          `;
+          reviewList.appendChild(div);
+        });
+      } else {
+        reviewSection.style.display = "none";
+      }
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    /* ============================================================
+       다시 풀기 (리셋)
+       ============================================================ */
+    function restartQuiz() {
+      currentIndex = 0;
+      score = 0;
+      wrongQuestions = [];
+      liveScoreEl.textContent = "0";
+
+      resultContainer.classList.remove("show");
+      quizCard.style.display = "flex";
+      progressBarSection.style.display = "flex";
+
+      loadQuestion(0);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    /* ============================================================
+       화면 모드 (교실 TV 모드 토글)
+       ============================================================ */
+    let tvModeState = 0; // 0: 일반(스마트폰/모니터), 1: TV 보통, 2: TV 대형
+    btnTv.addEventListener("click", () => {
+      tvModeState = (tvModeState + 1) % 3;
+      if (tvModeState === 0) {
+        document.body.classList.remove("tv-mode", "tv-large-mode");
+        btnTv.classList.remove("active");
+        btnTv.innerHTML = `<span>📺</span> 교실 TV 모드`;
+      } else if (tvModeState === 1) {
+        document.body.classList.add("tv-mode");
+        document.body.classList.remove("tv-large-mode");
+        btnTv.classList.add("active");
+        btnTv.innerHTML = `<span>📺</span> TV 모드 (보통)`;
+      } else {
+        document.body.classList.remove("tv-mode");
+        document.body.classList.add("tv-large-mode");
+        btnTv.classList.add("active");
+        btnTv.innerHTML = `<span>📺</span> TV 모드 (크게)`;
+      }
+    });
+
+    /* 효과음 토글 */
+    btnSound.addEventListener("click", () => {
+      soundEnabled = !soundEnabled;
+      if (soundEnabled) {
+        btnSound.classList.add("active");
+        btnSound.innerHTML = `<span>🔊</span> 소리 켬`;
+      } else {
+        btnSound.classList.remove("active");
+        btnSound.innerHTML = `<span>🔇</span> 소리 끔`;
+      }
+    });
+
+    /* 오답 접기/펴기 */
+    let reviewOpen = true;
+    reviewToggleBtn.addEventListener("click", () => {
+      reviewOpen = !reviewOpen;
+      reviewList.style.display = reviewOpen ? "flex" : "none";
+      reviewArrow.textContent = reviewOpen ? "▼" : "▶";
+    });
+
+    /* 키보드 단축키 지원 (1~4번 키로 답 선택, Enter/스페이스로 다음 문제 이동) */
+    window.addEventListener("keydown", (e) => {
+      if (quizCard.style.display !== "none") {
+        if (!answered) {
+          if (["1", "2", "3", "4"].includes(e.key)) {
+            handleSelectOption(parseInt(e.key) - 1);
+          }
+        } else {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            handleNext();
+          }
+        }
+      }
+    });
+
+    /* 버튼 이벤트 연결 */
+    btnNext.addEventListener("click", handleNext);
+    btnRestart.addEventListener("click", restartQuiz);
+
+    /* ============================================================
+       순수 캔버스 콘페티 (만점/고득점 축하 효과)
+       ============================================================ */
+    function triggerConfetti() {
+      const canvas = document.getElementById("confetti-canvas");
+      const ctx = canvas.getContext("2d");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const pieces = [];
+      const colors = ["#2563eb", "#38bdf8", "#4ade80", "#facc15", "#f43f5e", "#a855f7"];
+
+      for (let i = 0; i < 90; i++) {
+        pieces.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height - canvas.height,
+          size: Math.random() * 8 + 6,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          speedY: Math.random() * 4 + 2,
+          speedX: Math.random() * 3 - 1.5,
+          rotation: Math.random() * 360,
+          rotationSpeed: Math.random() * 6 - 3
+        });
+      }
+
+      let frame = 0;
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        pieces.forEach(p => {
+          p.y += p.speedY;
+          p.x += p.speedX;
+          p.rotation += p.rotationSpeed;
+
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate((p.rotation * Math.PI) / 180);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+          ctx.restore();
+        });
+
+        frame++;
+        if (frame < 180) {
+          requestAnimationFrame(animate);
+        } else {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+      }
+      animate();
+    }
+
+    // 윈도우 리사이즈 대응
+    window.addEventListener("resize", () => {
+      const canvas = document.getElementById("confetti-canvas");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+
+    // 앱 시작
+    loadQuestion(0);
+  </script>
+</body>
+</html>
